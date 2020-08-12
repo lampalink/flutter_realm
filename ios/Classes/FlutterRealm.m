@@ -32,7 +32,9 @@
                 [sendData addObject:item];
             }
             map[p.name] = sendData;
-        }else {
+        } else if ([self[p.name] isKindOfClass:[RLMObject class]]) {
+            map[p.name] = [(RLMObject *)self[p.name] toMap];
+        } else {
             map[p.name] = self[p.name];
         }
     }
