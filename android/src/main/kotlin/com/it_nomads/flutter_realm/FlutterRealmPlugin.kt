@@ -13,8 +13,8 @@ import io.realm.SyncUser
 import java.util.*
 import kotlin.collections.ArrayList
 
-/** FlutterRealmConPlugin */
-public class FlutterRealmConPlugin: FlutterPlugin, MethodCallHandler {
+/** FlutterRealmPlugin */
+public class FlutterRealmPlugin: FlutterPlugin, MethodCallHandler {
   private lateinit var channel : MethodChannel
   private val realms = HashMap<String, FlutterRealm>()
   private val handlers: List<MethodSubHandler> = ArrayList()
@@ -32,7 +32,7 @@ public class FlutterRealmConPlugin: FlutterPlugin, MethodCallHandler {
       Realm.init(registrar.context())
 
       val channel = MethodChannel(registrar.messenger(), "plugins.it_nomads.com/flutter_realm")
-      channel.setMethodCallHandler(FlutterRealmConPlugin())
+      channel.setMethodCallHandler(FlutterRealmPlugin())
     }
   }
 
