@@ -13,7 +13,6 @@ import io.realm.SyncUser
 import java.util.*
 import kotlin.collections.ArrayList
 
-/** FlutterRealmPlugin */
 public class FlutterRealmPlugin: FlutterPlugin, MethodCallHandler {
   private lateinit var channel : MethodChannel
   private val realms = HashMap<String, FlutterRealm>()
