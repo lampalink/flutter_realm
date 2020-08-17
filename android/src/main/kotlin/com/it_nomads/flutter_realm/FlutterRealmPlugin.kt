@@ -14,7 +14,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 public class FlutterRealmPlugin: FlutterPlugin, MethodCallHandler {
-  private lateinit var channel : MethodChannel
+  private var channel : MethodChannel
   private val realms = HashMap<String, FlutterRealm>()
   private val handlers: List<MethodSubHandler> = ArrayList()
 
