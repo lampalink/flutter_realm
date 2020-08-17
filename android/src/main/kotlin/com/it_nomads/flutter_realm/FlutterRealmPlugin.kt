@@ -14,9 +14,15 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 public class FlutterRealmPlugin: FlutterPlugin, MethodCallHandler {
-  private var channel : MethodChannel
+  private lateinit var channel : MethodChannel
   private val realms = HashMap<String, FlutterRealm>()
   private val handlers: List<MethodSubHandler> = ArrayList()
+
+  constructor() {}
+
+  constructor(_channel: MethodChannel) {
+    channel = _channel
+  }
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     Realm.init(flutterPluginBinding.applicationContext)
@@ -31,7 +37,7 @@ public class FlutterRealmPlugin: FlutterPlugin, MethodCallHandler {
       Realm.init(registrar.context())
 
       val channel = MethodChannel(registrar.messenger(), "plugins.it_nomads.com/flutter_realm")
-      channel.setMethodCallHandler(FlutterRealmPlugin())
+      channel.setMethodCallHandler(FlutterRealmPlugin(channel))
     }
   }
 
