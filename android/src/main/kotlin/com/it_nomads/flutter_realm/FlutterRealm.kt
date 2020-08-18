@@ -44,11 +44,18 @@ class FlutterRealm {
             when (call.method) {
                 "createObject" -> {
                     val className = arguments["$"] as String?
-                    val uuid = arguments["uuid"] as String?
-                    assert(className != null)
-                    assert(uuid != null)
+                    val primaryKey = if (arguments["uuid"] != null) {
+                        arguments["uuid"] as String
+                    } else if (arguments["id"] != null) {
+                        arguments["id"] as String
+                    } else if (arguments["key"] != null) {
+                        arguments["key"] as String
+                    } else {
+                        throw java.lang.Exception("Missing primary key")
+                    }
+
                     realm.beginTransaction()
-                    val obj = realm.createObject(className, uuid)
+                    val obj = realm.createObject(className, primaryKey)
                     mapToObject(obj, arguments)
                     realm.commitTransaction()
                     result.success(null)
