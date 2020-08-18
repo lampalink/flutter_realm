@@ -27,7 +27,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-// apply plugin: 'realm-android'
+apply plugin: 'realm-android'
 
 realm {
     syncEnabled = true
@@ -36,9 +36,9 @@ realm {
 android {
     compileSdkVersion 28
 
-    //sourceSets {
-    //    main.java.srcDirs += 'src/main/kotlin'
-    //}
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 
     defaultConfig {
         minSdkVersion 16
