@@ -46,20 +46,15 @@ class FlutterRealm {
             when (call.method) {
                 "createObject" -> {
                     val className = arguments["$"] as String?
-
-                    val primaryKey = if (arguments["uuid"] != null) {
-                        arguments["uuid"] as String
-                    } else if (arguments["localId"] != null) {
-                        arguments["localId"] as String
-                    } else if (arguments["id"] != null) {
-                        arguments["id"] as String
-                    } else {
-                        null
-                    }
-
+                    val classSchema = realm.schema.get(className)
+                            ?: throw java.lang.Exception("Schema Not Found")
                     realm.beginTransaction()
-                    val obj = realm.createObject(className, primaryKey)
-                    mapToObject(obj, arguments)
+                    val obj = if (classSchema.hasPrimaryKey()) {
+                        realm.createObject(className, arguments[classSchema.primaryKey])
+                    } else {
+                        realm.createObject(className)
+                    }
+                    mapToObject(obj, arguments, listOf("uuid", classSchema.primaryKey))
                     realm.commitTransaction()
                     result.success(objectToMap(obj))
                 }
@@ -80,6 +75,8 @@ class FlutterRealm {
                 }
                 "updateObject" -> {
                     val className = arguments["$"] as String?
+                    val classSchema = realm.schema.get(className)
+                            ?: throw java.lang.Exception("Schema Not Found")
                     val primaryKey = arguments["primaryKey"]
                     val value = arguments["value"] as HashMap<*, *>?
                     val obj = find(className, primaryKey)
@@ -89,7 +86,7 @@ class FlutterRealm {
                         return
                     }
                     realm.beginTransaction()
-                    mapToObject(obj, value)
+                    mapToObject(obj, value, listOf("uuid", classSchema.primaryKey))
                     realm.commitTransaction()
                     result.success(objectToMap(obj))
                 }
@@ -147,10 +144,18 @@ class FlutterRealm {
 
     private fun find(className: String?, primaryKey: Any?): DynamicRealmObject? {
         var obj: DynamicRealmObject? = null
+
+        val classSchema = realm.schema.get(className)
+                ?: throw java.lang.Exception("Schema Not Found")
+
+        if (!classSchema.hasPrimaryKey()) {
+            throw java.lang.Exception("Cannot call find without primary key")
+        }
+
         if (primaryKey is String) {
-            obj = realm.where(className).equalTo("uuid", primaryKey as String?).findFirst()
+            obj = realm.where(className).equalTo(classSchema.primaryKey, primaryKey as String?).findFirst()
         } else if (primaryKey is Int) {
-            obj = realm.where(className).equalTo("uuid", primaryKey as Int?).findFirst()
+            obj = realm.where(className).equalTo(classSchema.primaryKey, primaryKey as Int?).findFirst()
         }
         return obj
     }
@@ -294,9 +299,9 @@ class FlutterRealm {
         return map
     }
 
-    private fun mapToObject(obj: DynamicRealmObject, map: Map<*, *>?) {
+    private fun mapToObject(obj: DynamicRealmObject, map: Map<*, *>?, excludeFields: List<String>? = listOf("uuid")) {
         for (fieldName in obj.fieldNames) {
-            if (!map!!.containsKey(fieldName) || fieldName == "uuid" || fieldName == "id" || fieldName == "localId") {
+            if (!map!!.containsKey(fieldName) || !excludeFields!!.contains(fieldName)) {
                 continue
             }
 
