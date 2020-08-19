@@ -4,6 +4,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.realm.*
 import java.util.*
+import kotlin.collections.HashMap
 
 
 class FlutterRealm {
@@ -305,6 +306,18 @@ class FlutterRealm {
                 val newValue: RealmList<*> = RealmList<Any>()
                 newValue.addAll(value as Collection<Nothing>)
                 value = newValue
+            }
+
+            if (value is HashMap<*, *>) {
+                if (obj.getObject(fieldName) == null) {
+                    val proxyState = obj.`realmGet$proxyState`()
+                    val columnIndex = proxyState.`row$realm`.getColumnIndex(fieldName)
+                    val table = proxyState.`row$realm`.table.getLinkTarget(columnIndex)
+                    obj[fieldName] = realm.createObject(table.className)
+                }
+
+                mapToObject(obj[fieldName], value.toMap())
+                continue
             }
 
             obj[fieldName] = value
