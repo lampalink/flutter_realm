@@ -301,7 +301,7 @@ class FlutterRealm {
 
     private fun mapToObject(obj: DynamicRealmObject, map: Map<*, *>?, excludeFields: List<String>? = listOf("uuid")) {
         for (fieldName in obj.fieldNames) {
-            if (!map!!.containsKey(fieldName) || !excludeFields!!.contains(fieldName)) {
+            if (!map!!.containsKey(fieldName) || excludeFields!!.contains(fieldName)) {
                 continue
             }
 
