@@ -48,6 +48,8 @@ class FlutterRealm {
 
                     val primaryKey = if (arguments["uuid"] != null) {
                         arguments["uuid"] as String
+                    } else if (arguments["localId"] != null) {
+                        arguments["localId"] as String
                     } else if (arguments["id"] != null) {
                         arguments["id"] as String
                     } else {
@@ -293,7 +295,7 @@ class FlutterRealm {
 
     private fun mapToObject(obj: DynamicRealmObject, map: Map<*, *>?) {
         for (fieldName in obj.fieldNames) {
-            if (!map!!.containsKey(fieldName) || fieldName == "uuid" || fieldName == "id") {
+            if (!map!!.containsKey(fieldName) || fieldName == "uuid" || fieldName == "id" || fieldName == "localId") {
                 continue
             }
 
