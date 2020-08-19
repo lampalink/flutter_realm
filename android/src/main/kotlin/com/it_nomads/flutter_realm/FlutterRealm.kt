@@ -5,6 +5,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.realm.*
 import java.util.*
 
+
 class FlutterRealm {
     private val realmId: String
     private var realm: DynamicRealm
@@ -44,22 +45,20 @@ class FlutterRealm {
             when (call.method) {
                 "createObject" -> {
                     val className = arguments["$"] as String?
-                    //val primaryKey = if (arguments["uuid"] != null) {
-                    //    arguments["uuid"] as String
-                    //} else if (arguments["id"] != null) {
-                    //    arguments["id"] as String
-                    //} else if (arguments["key"] != null) {
-                    //    arguments["key"] as String
-                    //} else {
-                    //    throw java.lang.Exception("Missing primary key")
-                    //}
+
+                    val primaryKey = if (arguments["uuid"] != null) {
+                        arguments["uuid"] as String
+                    } else if (arguments["id"] != null) {
+                        arguments["id"] as String
+                    } else {
+                        null
+                    }
 
                     realm.beginTransaction()
-                    // val obj = realm.createObject(className, primaryKey)
-                    val obj = realm.createObject(className)
+                    val obj = realm.createObject(className, primaryKey)
                     mapToObject(obj, arguments)
                     realm.commitTransaction()
-                    result.success(null)
+                    result.success(objectToMap(obj))
                 }
                 "deleteObject" -> {
                     val className = arguments["$"] as String?
@@ -281,23 +280,31 @@ class FlutterRealm {
                 map[fieldName] = value
                 continue
             }
+            if (obj.getFieldType(fieldName) === RealmFieldType.OBJECT) {
+                val value: DynamicRealmObject = obj.getObject(fieldName) as DynamicRealmObject
+                map[fieldName] = objectToMap(value)
+                continue
+            }
             val value = obj.get<Any>(fieldName)
-            map[fieldName] = value
+            map[fieldName] = value.toString()
         }
         return map
     }
 
     private fun mapToObject(obj: DynamicRealmObject, map: Map<*, *>?) {
         for (fieldName in obj.fieldNames) {
-            if (!map!!.containsKey(fieldName) || fieldName == "uuid") {
+            if (!map!!.containsKey(fieldName) || fieldName == "uuid" || fieldName == "id") {
                 continue
             }
+
             var value = map[fieldName]
+
             if (value is List<*>) {
                 val newValue: RealmList<*> = RealmList<Any>()
                 newValue.addAll(value as Collection<Nothing>)
                 value = newValue
             }
+
             obj[fieldName] = value
         }
     }
