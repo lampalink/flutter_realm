@@ -294,7 +294,7 @@ class FlutterRealm {
                 continue
             }
             val value = obj.get<Any>(fieldName)
-            map[fieldName] = value.toString()
+            map[fieldName] = value
         }
         return map
     }
