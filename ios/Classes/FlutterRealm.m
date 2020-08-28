@@ -123,7 +123,7 @@
             value = [self sanitizeReceivedValue:value];
             
             [self.realm beginWriteTransaction];
-            [object setValuesForKeysWithDictionary:value];
+            [self traverseObjectUpdate:object withDictionaryValue:value];
             [self.realm commitWriteTransaction];
             
             result([object toMap]);
@@ -350,6 +350,27 @@
         }
     }
     return result;
+}
+
+- (void)traverseObjectUpdate:(RLMObject *)object withDictionaryValue:(NSDictionary *)value {
+    for (NSString *key in value.allKeys) {
+        id item = value[key];
+        
+        if (item == nil || [item isKindOfClass:[NSNull class]]) {
+            continue;
+        }
+
+        if ([item isKindOfClass:[NSDictionary class]]) {
+            [self traverseObjectUpdate:object[key] withDictionaryValue:item];
+            continue;
+        }
+        
+        if ([item isKindOfClass:[NSArray class]] || [item isKindOfClass:[RLMArray class]]) {
+            continue;
+        }
+
+        [object setValue:value[key] forKeyPath:key];
+    }
 }
 
 @end
