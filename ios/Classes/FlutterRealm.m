@@ -123,8 +123,7 @@
             value = [self sanitizeReceivedValue:value];
 
             [self.realm beginWriteTransaction];
-            [object setValuesForKeysWithDictionary:value];
-            // [self traverseObjectUpdate:object withDictionaryValue:value];
+            [self traverseObjectUpdate:object withDictionaryValue:value];
             [self.realm commitWriteTransaction];
 
             result([object toMap]);
@@ -367,7 +366,6 @@
         }
         
         if ([item isKindOfClass:[NSArray class]] || [item isKindOfClass:[RLMArray class]]) {
-            [self traverseObjectUpdate:object[key] withDictionaryValue:item];
             continue;
         }
 
