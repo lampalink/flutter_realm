@@ -366,6 +366,7 @@
         }
         
         if ([item isKindOfClass:[NSArray class]] || [item isKindOfClass:[RLMArray class]]) {
+            [self traverseObjectUpdate:object[key] withDictionaryValue:item];
             continue;
         }
 
