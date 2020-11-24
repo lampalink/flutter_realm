@@ -119,18 +119,19 @@
                 result([self notFoundFor:call]);
                 return;
             }
-            
+
             value = [self sanitizeReceivedValue:value];
-            
+
             [self.realm beginWriteTransaction];
-            [self traverseObjectUpdate:object withDictionaryValue:value];
+            [object setValuesForKeysWithDictionary:value];
+            // [self traverseObjectUpdate:object withDictionaryValue:value];
             [self.realm commitWriteTransaction];
-            
+
             result([object toMap]);
         }   else if ([@"deleteObject" isEqualToString:method]) {
             NSString *classname = arguments[@"$"];
             id primaryKey = arguments[@"primaryKey"];
-            
+
             if (classname == nil || primaryKey == nil){
                 result([self invalidParametersFor:call]);
                 return;
