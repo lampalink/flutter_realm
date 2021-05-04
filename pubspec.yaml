@@ -10,7 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  uuid: ^2.0.1
+  # uuid: ^2.0.1
+  uuid: ^3.0.4
   rxdart: ^0.22.0
   meta: ^1.1.0
 
